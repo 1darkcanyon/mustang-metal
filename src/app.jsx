@@ -1,5 +1,3 @@
-// Vercel Production Build Version 4.0
-
 import { useState, useEffect, useRef } from "react";
 
 const ADMIN_PASSWORD = "mustang2026";
@@ -36,98 +34,37 @@ function Gallery({ items }) {
 
   return (
     <div>
-      {/* Hero Section */}
-      <div className="hero-container">
-        <div className="hero-emblem">
-          <FlameIcon /> <span className="horse-emblem">🐴</span> <FlameIcon />
+      {items.length === 0 ? (
+        <div className="empty-state">
+          Gallery coming soon — check back shortly!
         </div>
-        <h1 className="hero-title">
-          Mustang Metal<br />Creations
-        </h1>
-        <p className="hero-subtitle">
-          FORGED IN FIRE · BUILT TO LAST
-        </p>
-        <div className="accent-divider" />
-        <p className="hero-description">
-          Custom metal furniture, mobile welding, and one-of-a-kind home furnishings crafted in Southern Oregon.
-        </p>
-        <a href="#gallery" className="btn-action-glow">
-          View Our Work
-        </a>
-
-        {/* Services Strip */}
-        <div className="services-strip">
-          {["🔧 Mobile Welding", "🏠 Custom Furnishings", "⚡ Metal Fabrication"].map(s => (
-            <span key={s} className="service-tag">{s}</span>
-          ))}
-        </div>
-      </div>
-
-      {/* Gallery Section */}
-      <div id="gallery" className="gallery-section">
-        <h2 className="section-title">Our Work</h2>
-        <p className="section-subtitle">Custom Pieces · Each One Unique</p>
-
-        {items.length === 0 ? (
-          <div className="empty-state">
-            Gallery coming soon — check back shortly!
-          </div>
-        ) : (
-          <div className="grid-layout">
-            {items.map(item => (
-              <div key={item.id} onClick={() => setSel(item)} className="gallery-card">
-                <div className="card-image-wrapper">
-                  <img src={item.src} alt={item.title} className="card-img" />
-                </div>
-                <div className="card-body">
-                  <h3 className="card-heading">{item.title}</h3>
-                  {item.desc && <p className="card-text">{item.desc}</p>}
-                  {item.price && <div className="card-price-tag">{item.price}</div>}
-                </div>
+      ) : (
+        <div className="grid-layout">
+          {items.map((item) => (
+            <div key={item.id} onClick={() => setSel(item)} className="gallery-card">
+              <div className="card-image-wrapper">
+                <img src={item.src} alt={item.title} className="card-img" />
               </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Contact Section */}
-      <div className="contact-section">
-        <h2 className="section-title" style={{ fontSize: "2rem", marginBottom: "2.5rem" }}>Get In Touch</h2>
-        <div className="contact-flex-container">
-          {[
-            { label: "Contact", val: "Kris Marie" },
-            { label: "Phone", val: "541-295-4498", href: "tel:5412954498" },
-            { label: "Email", val: "mustangmetalc@gmail.com", href: "mailto:mustangmetalc@gmail.com" },
-            { label: "Website", val: "mustangmetal.shop", href: "https://mustangmetal.shop" },
-          ].map(c => (
-            <div key={c.label} className="contact-badge">
-              <p className="badge-label">{c.label}</p>
-              {c.href
-                ? <a href={c.href} className="badge-link">{c.val}</a>
-                : <p className="badge-value">{c.val}</p>
-              }
+              <div className="card-body">
+                <h3 className="card-heading">{item.title}</h3>
+                {item.desc && <p className="card-text">{item.desc}</p>}
+                {item.price && <div className="card-price-tag">{item.price}</div>}
+              </div>
             </div>
           ))}
         </div>
-      </div>
+      )}
 
-      <div className="footer-credits">
-        © 2026 Mustang Metal Creations · Southern Oregon
-      </div>
-
-      {/* Lightbox / Modal Module */}
       {sel && (
-        <div onClick={() => setSel(null)} className="lightbox-overlay">
-          <div onClick={e => e.stopPropagation()} className="lightbox-window">
-            <img src={sel.src} alt={sel.title} className="lightbox-img" />
-            <div className="lightbox-footer">
-              <div>
-                <h3 className="lightbox-title">{sel.title}</h3>
-                {sel.desc && <p className="lightbox-desc">{sel.desc}</p>}
-              </div>
-              {sel.price && <div className="card-price-tag" style={{ fontSize: "1.1rem" }}>{sel.price}</div>}
+        <div className="modal-overlay" onClick={() => setSel(null)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <img src={sel.src} alt={sel.title} className="modal-img" />
+            <div className="modal-body">
+              <h3>{sel.title}</h3>
+              {sel.desc && <p>{sel.desc}</p>}
+              {sel.price && <div className="modal-price">{sel.price}</div>}
+              <button className="close-btn" onClick={() => setSel(null)}>Close</button>
             </div>
-            <button onClick={() => setSel(null)} className="btn-close-modal">CLOSE WINDOW</button>
           </div>
         </div>
       )}
@@ -135,184 +72,18 @@ function Gallery({ items }) {
   );
 }
 
-// ─── ADMIN PANEL ──────────────────────────────────────────────────────────────
-function Admin({ items, setItems, onLogout }) {
-  const [title, setTitle] = useState("");
-  const [desc, setDesc] = useState("");
-  const [price, setPrice] = useState("");
-  const [src, setSrc] = useState(null);
-  const [preview, setPreview] = useState(null);
-  const [saving, setSaving] = useState(false);
-  const [msg, setMsg] = useState("");
-  const [editId, setEditId] = useState(null);
-  const fileRef = useRef();
-
-  const flash = (m) => { setMsg(m); setTimeout(() => setMsg(""), 3000); };
-
-  const handleFile = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const compressed = await compressImage(file);
-    setSrc(compressed);
-    setPreview(compressed);
-  };
-
-  const save = async () => {
-    if (!title.trim()) { flash("⚠ Title is required"); return; }
-    if (!src && !editId) { flash("⚠ Please select a photo"); return; }
-    setSaving(true);
-    try {
-      let updated;
-      if (editId) {
-        updated = items.map(i => i.id === editId ? {
-          ...i, title: title.trim(), desc: desc.trim(), price: price.trim(),
-          ...(src ? { src } : {})
-        } : i);
-      } else {
-        if (items.length >= MAX_PHOTOS) { flash(`⚠ Max ${MAX_PHOTOS} photos reached`); setSaving(false); return; }
-        const newItem = { id: Date.now().toString(), title: title.trim(), desc: desc.trim(), price: price.trim(), src };
-        updated = [...items, newItem];
-      }
-      setItems(updated);
-      resetForm();
-      flash(editId ? "✓ Item updated successfully!" : "✓ Photo deployed to gallery!");
-    } catch (err) {
-      flash("✗ Save failed — storage limits reached");
-    }
-    setSaving(false);
-  };
-
-  const remove = async (id) => {
-    if (!confirm("Permanently erase this entity from the public gallery?")) return;
-    const updated = items.filter(i => i.id !== id);
-    setItems(updated);
-    if (editId === id) resetForm();
-    flash("✓ Item removed");
-  };
-
-  const startEdit = (item) => {
-    setEditId(item.id);
-    setTitle(item.title);
-    setDesc(item.desc || "");
-    setPrice(item.price || "");
-    setPreview(item.src);
-    setSrc(null);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  const resetForm = () => {
-    setEditId(null); setTitle(""); setDesc(""); setPrice(""); setSrc(null); setPreview(null);
-    if (fileRef.current) fileRef.current.value = "";
-  };
-
-  const renderInput = (placeholder, val, set) => (
-    <input type="text" placeholder={placeholder} value={val} onChange={e => set(e.target.value)} className="admin-input" />
-  );
-
-  return (
-    <div className="admin-bg">
-      {/* Admin Top Bar */}
-      <div className="admin-header">
-        <div>
-          <h1 className="admin-title">🐴 MMC Gallery Manager</h1>
-          <p className="admin-subtitle">MUSTANG METAL CREATIONS · CORE ACCESS</p>
-        </div>
-        <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
-          <span className="allocation-counter">{items.length} / {MAX_PHOTOS} PHOTOS</span>
-          <button onClick={onLogout} className="btn-logout">LOG OUT</button>
-        </div>
-      </div>
-
-      {msg && (
-        <div className={`status-banner ${msg.startsWith("✓") ? "success" : "error"}`}>
-          {msg}
-        </div>
-      )}
-
-      <div className="admin-workspace-grid">
-        {/* Creator Control Form */}
-        <div>
-          <div className="admin-form-card">
-            <h2 className="form-card-title">
-              {editId ? "✏️ Edit Manifest Item" : "➕ Deploy New Asset"}
-            </h2>
-
-            {renderInput("Item Title *", title, setTitle)}
-            {renderInput("Description (optional)", desc, setDesc)}
-            {renderInput("Price Matrix (optional)", price, setPrice)}
-
-            <div onClick={() => fileRef.current.click()} className="uploader-zone">
-              {preview ? (
-                <img src={preview} className="uploader-preview-img" alt="preview" />
-              ) : (
-                <span className="uploader-prompt">📷 Tap to upload asset<br /><small>JPG, PNG, WEBP</small></span>
-              )}
-            </div>
-            <input ref={fileRef} type="file" accept="image/*" onChange={handleFile} style={{ display: "none" }} />
-
-            <div style={{ display: "flex", gap: "0.75rem" }}>
-              <button onClick={save} disabled={saving} className="btn-submit-asset">
-                {saving ? "Processing…" : editId ? "Commit Changes" : "Publish to Gallery"}
-              </button>
-              {editId && (
-                <button onClick={resetForm} className="btn-cancel-edit">Cancel</button>
-              )}
-            </div>
-          </div>
-
-          <div className="tips-card">
-            <p className="tips-text">
-              💡 <strong>System Operations:</strong><br />
-              • Images are auto-scaled for edge delivery compression.<br />
-              • Leaving the price block clean translates to a custom-quoted build status.<br />
-              • Total node footprint capacity caps at {MAX_PHOTOS} assets.
-            </p>
-          </div>
-        </div>
-
-        {/* Console Grid Layout View */}
-        <div>
-          <h2 className="form-card-title" style={{ marginBottom: "1.5rem" }}>
-            Current Manifest ({items.length} records)
-          </h2>
-
-          {items.length === 0 ? (
-            <div className="admin-empty-state">
-              No assets initialized in local matrix. Deploy an asset on the left pane.
-            </div>
-          ) : (
-            <div className="admin-mini-grid">
-              {items.map(item => (
-                <div key={item.id} className={`admin-mini-card ${editId === item.id ? "active-edit" : ""}`}>
-                  <div className="mini-card-img-wrap">
-                    <img src={item.src} alt={item.title} className="card-img" />
-                  </div>
-                  <div style={{ padding: "0.75rem" }}>
-                    <p className="mini-card-title">{item.title}</p>
-                    {item.price && <p className="mini-card-price">{item.price}</p>}
-                    <div style={{ display: "flex", gap: "0.4rem", marginTop: "0.5rem" }}>
-                      <button onClick={() => startEdit(item)} className="btn-mini-action edit">EDIT</button>
-                      <button onClick={() => remove(item.id)} className="btn-mini-action delete">PURGE</button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── LOGIN ────────────────────────────────────────────────────────────────────
+// ─── ADMIN LOGIN INTERFACE ────────────────────────────────────────────────────
 function Login({ onLogin }) {
   const [pw, setPw] = useState("");
   const [err, setErr] = useState("");
 
   const attempt = () => {
-    if (pw === ADMIN_PASSWORD) { onLogin(); }
-    else { setErr("Identity mismatch. Access denied."); setPw(""); }
+    if (pw === ADMIN_PASSWORD) {
+      onLogin();
+    } else {
+      setErr("Identity mismatch. Access denied.");
+      setPw("");
+    }
   };
 
   return (
@@ -322,257 +93,188 @@ function Login({ onLogin }) {
         <h1 className="login-heading">Admin Interface</h1>
         <p className="login-subheading">MUSTANG METAL CREATIONS</p>
         <input
-          type="password" placeholder="Passkey Signature" value={pw}
-          onChange={e => setPw(e.target.value)}
-          onKeyDown={e => e.key === "Enter" && attempt()}
+          type="password"
+          placeholder="Passkey Signature"
+          value={pw}
+          onChange={(e) => setPw(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && attempt()}
           className="admin-input"
           style={{ textAlign: "center", marginBottom: "1rem" }}
         />
-        {err && <p className="login-error-text">{err}</p>}
-        <button onClick={attempt} className="btn-submit-asset" style={{ width: "100%" }}>
-          AUTHORIZE OPERATOR
-        </button>
+        {err && <p className="error-text" style={{ color: "#ff4a4a", fontSize: "0.9rem", marginBottom: "1rem" }}>{err}</p>}
+        <button onClick={attempt} className="action-btn">Authenticate</button>
       </div>
     </div>
   );
 }
 
-// ─── ROOT CONTAINER (Namecheap LocalStorage Native) ───────────────────────────
+// ─── MAIN MANAGEMENT DASHBOARD ───────────────────────────────────────────────
+function AdminDashboard({ items, setItems, onLogout }) {
+  const [title, setTitle] = useState("");
+  const [desc, setDesc] = useState("");
+  const [price, setPrice] = useState("");
+  const [file, setFile] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const handleUpload = async (e) => {
+    e.preventDefault();
+    if (!file || !title) return;
+    if (items.length >= MAX_PHOTOS) {
+      alert(`Gallery maximum capacity reached (${MAX_PHOTOS} photos). Delete an existing entry first.`);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const base64 = await compressImage(file);
+      const newItem = {
+        id: Date.now().toString(),
+        title,
+        desc,
+        price,
+        src: base64,
+      };
+      const updated = [newItem, ...items];
+      setItems(updated);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      setTitle("");
+      setDesc("");
+      setPrice("");
+      setFile(null);
+      e.target.reset();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = (id) => {
+    if (!confirm("Are you sure you want to permanently remove this piece?")) return;
+    const updated = items.filter((item) => item.id !== id);
+    setItems(updated);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+  };
+
+  return (
+    <div className="admin-dashboard">
+      <div className="dash-header">
+        <h2>Portals Management Console</h2>
+        <button className="logout-btn" onClick={onLogout}>Exit Session</button>
+      </div>
+
+      <form onSubmit={handleUpload} className="upload-form">
+        <h3>Deploy New Creation Asset</h3>
+        <input type="text" placeholder="Piece Title" value={title} onChange={(e) => setTitle(e.target.value)} required />
+        <textarea placeholder="Description / Dimensions (Optional)" value={desc} onChange={(e) => setDesc(e.target.value)} />
+        <input type="text" placeholder="Pricing info (e.g. $450 or Call for Quote)" value={price} onChange={(e) => setPrice(e.target.value)} />
+        <input type="file" accept="image/*" onChange={(e) => setFile(e.target.files[0])} required />
+        <button type="submit" disabled={loading} className="action-btn">
+          {loading ? "Optimizing Assets..." : "Inject Matrix Entry"}
+        </button>
+      </form>
+
+      <div className="admin-grid">
+        <h3>Current Active Matrix Assets ({items.length}/{MAX_PHOTOS})</h3>
+        {items.length === 0 ? (
+          <p>No records active. Upload a creation asset above.</p>
+        ) : (
+          <div className="mini-grid">
+            {items.map((item) => (
+              <div key={item.id} className="mini-card">
+                <img src={item.src} alt={item.title} />
+                <div className="mini-info">
+                  <h4>{item.title}</h4>
+                  <button onClick={() => handleDelete(item.id)} className="delete-btn">Purge</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── CORE SYSTEM APPLICATION ──────────────────────────────────────────────────
 export default function App() {
-  const [view, setView] = useState("public"); 
+  const [view, setView] = useState("public");
   const [items, setItems] = useState([]);
   const [loaded, setLoaded] = useState(false);
+  const clicks = useRef(0);
+  const clickTimer = useRef(null);
 
-  // Load configuration cleanly from active device memory
   useEffect(() => {
-    try {
-      const savedData = localStorage.getItem(STORAGE_KEY);
-      if (savedData) {
-        setItems(JSON.parse(savedData));
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      try {
+        setItems(JSON.parse(raw));
+      } catch (e) {
+        console.error("Data tracking fault cleared.");
       }
-    } catch (err) {
-      console.error("Local storage allocation error:", err);
     }
     setLoaded(true);
   }, []);
 
-  // Handler that synchronizes layout state and persistent client-side memory
-  const updateItemsAndStorage = (newItems) => {
-    setItems(newItems);
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(newItems));
-    } catch (err) {
-      alert("Storage full! Please purge older high-resolution elements first.");
+  const handleFooterClick = () => {
+    clicks.current++;
+    clearTimeout(clickTimer.current);
+    // 5 second rolling window for mobile stability
+    clickTimer.current = setTimeout(() => {
+      clicks.current = 0;
+    }, 5000);
+
+    if (clicks.current >= 5) {
+      clicks.current = 0;
+      setView("login");
     }
   };
 
-  const clicks = useRef(0);
-  const clickTimer = useRef(null);
-  const handleLogoClick = () => {
-    clicks.current++;
-    clearTimeout(clickTimer.current);
-    clickTimer.current = setTimeout(() => { clicks.current = 0; }, 1500);
-    if (clicks.current >= 5) { clicks.current = 0; setView("login"); }
-  };
-
-  if (!loaded) return (
-    <div className="loading-screen">INITIALIZING NEXUS MATRIX…</div>
-  );
+  if (!loaded) {
+    return <div className="loading-screen">INITIALIZING NEXUS MATRIX…</div>;
+  }
 
   return (
-    <>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Cinzel:wght@400;700&family=Raleway:wght@300;400;600&display=swap');
-        
-        :root {
-          --bg-darker: #06060a;
-          --bg-card: #11111a;
-          --bg-surface: #0a0a10;
-          --neon-magenta: #d400ff;
-          --neon-orange: #ff4400;
-          --text-cyan: #8ab4c8;
-          --border-color: rgba(212, 0, 255, 0.15);
-        }
+    <div className="app-container">
+      {/* HEADER STRIP */}
+      <header className="brand-header">
+        <div className="logo-area">
+          <FlameIcon /> 🐴 <FlameIcon />
+          <h1 className="neon-text-title">MUSTANG METAL</h1>
+          <h1 className="neon-text-title secondary">CREATIONS</h1>
+          <p className="tagline">FORGED IN FIRE • BUILT TO LAST</p>
+        </div>
+        <div className="accent-bar" />
+        <p className="intro-paragraph">
+          Custom metal furniture, mobile welding, and one-of-a-kind home furnishings crafted in Southern Oregon.
+        </p>
+      </header>
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: var(--bg-darker); color: #fff; font-family: 'Raleway', sans-serif; }
-        
-        .hero-container {
-          min-height: 100vh; display: flex; flex-direction: column;
-          align-items: center; justify-content: center; text-align: center;
-          padding: 2rem; position: relative; overflow: hidden;
-          background: radial-gradient(ellipse at 30% 20%, rgba(212,0,255,0.12) 0%, transparent 60%), 
-                      radial-gradient(ellipse at 70% 80%, rgba(255,68,0,0.14) 0%, transparent 60%), 
-                      var(--bg-surface);
-          background-image: 
-            linear-gradient(rgba(212, 0, 255, 0.02) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(212, 0, 255, 0.02) 1px, transparent 1px);
-          background-size: 30px 30px;
-        }
-        .hero-emblem { font-size: 3rem; margin-bottom: 1.5rem; }
-        .horse-emblem { filter: drop-shadow(0 0 12px var(--text-cyan)); }
-        .flame-effect { display: inline-block; animation: flicker 1.5s ease-in-out infinite alternate; }
-        
-        .hero-title {
-          font-family: 'Black Ops One', cursive; font-size: clamp(2.5rem, 8.5vw, 5rem);
-          line-height: 1.1; letter-spacing: 2px;
-          background: linear-gradient(135deg, #ffffff 10%, var(--text-cyan) 40%, var(--neon-magenta) 75%, var(--neon-orange) 100%);
-          -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-          filter: drop-shadow(0 0 25px rgba(212,0,255,0.35));
-          text-transform: uppercase;
-        }
-        .hero-subtitle { font-family: 'Cinzel', serif; letter-spacing: 0.35em; color: var(--text-cyan); margin-top: 1rem; font-size: 1.05rem; font-weight: 700; }
-        .accent-divider { width: 160px; height: 2px; margin: 2rem auto; background: linear-gradient(90deg, transparent, var(--neon-magenta), var(--neon-orange), transparent); }
-        .hero-description { color: #a5b4c4; max-width: 550px; line-height: 1.8; font-weight: 300; font-size: 1.05rem; }
-        
-        .btn-action-glow {
-          display: inline-block; margin-top: 2.5rem; padding: 1rem 2.5rem;
-          font-family: 'Cinzel', serif; letter-spacing: 0.2em; text-transform: uppercase;
-          color: #fff; border: 1px solid var(--neon-magenta); text-decoration: none;
-          background: transparent; font-size: 0.85rem; font-weight: 700; transition: all 0.4s ease;
-          box-shadow: 0 0 15px rgba(212, 0, 255, 0.1);
-        }
-        .btn-action-glow:hover {
-          background: linear-gradient(135deg, var(--neon-magenta), var(--neon-orange));
-          border-color: transparent; box-shadow: 0 0 25px rgba(255, 68, 0, 0.5); transform: translateY(-2px);
-        }
+      {/* CORE DISPLAY ROUTER */}
+      <main className="content-frame">
+        {view === "public" && (
+          <section id="gallery" className="gallery-section">
+            <h2 className="section-title">Our Work</h2>
+            <p className="section-subtitle">Custom Pieces - Each One Unique</p>
+            <Gallery items={items} />
+          </section>
+        )}
 
-        .services-strip { position: absolute; bottom: 0; left: 0; right: 0; display: flex; justify-content: center; gap: 4rem; padding: 1.5rem; background: rgba(5,5,10,0.85); backdrop-filter: blur(8px); border-top: 1px solid rgba(212,0,255,0.1); flex-wrap: wrap; }
-        .service-tag { color: var(--text-cyan); font-size: 0.85rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; }
+        {view === "login" && (
+          <Login onLogin={() => setView("admin")} />
+        )}
 
-        .gallery-section { background: var(--bg-darker); padding: 6rem 2rem; }
-        .section-title { font-family: 'Black Ops One', cursive; text-align: center; font-size: clamp(1.8rem, 5vw, 2.8rem); color: var(--text-cyan); letter-spacing: 1px; }
-        .section-subtitle { text-align: center; color: #404555; letter-spacing: 0.3em; font-size: 0.8rem; text-transform: uppercase; margin-top: 0.5rem; margin-bottom: 4rem; }
-        .grid-layout { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 2rem; max-width: 1200px; margin: 0 auto; }
-        
-        .gallery-card {
-          background: var(--bg-card); border: 1px solid var(--border-color);
-          overflow: hidden; cursor: pointer; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-          position: relative; box-shadow: 0 8px 30px rgba(0,0,0,0.3);
-        }
-        .gallery-card:hover {
-          border-color: rgba(255, 68, 0, 0.4); transform: translateY(-6px);
-          box-shadow: 0 12px 40px rgba(255, 68, 0, 0.15);
-        }
-        .card-image-wrapper { position: relative; padding-bottom: 80%; background: #050508; overflow: hidden; }
-        .card-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
-        .gallery-card:hover .card-img { transform: scale(1.04); }
-        
-        .card-body { padding: 1.5rem; border-top: 1px solid rgba(255,255,255,0.02); }
-        .card-heading { font-family: 'Cinzel', serif; color: var(--text-cyan); font-size: 1.1rem; margin-bottom: 0.5rem; letter-spacing: 1px; }
-        .card-text { color: #707b88; font-size: 0.9rem; line-height: 1.6; margin-bottom: 1rem; font-weight: 300; }
-        
-        .card-price-tag {
-          display: inline-block; padding: 0.4rem 1.2rem;
-          background: linear-gradient(135deg, rgba(212,0,255,0.15), rgba(255,68,0,0.15));
-          border: 1px solid rgba(212,0,255,0.3); color: #ff55bb; font-size: 0.85rem;
-          font-family: 'Cinzel', serif; letter-spacing: 0.1em; font-weight: 700;
-          box-shadow: 0 0 10px rgba(212,0,255,0.1);
-        }
+        {view === "admin" && (
+          <AdminDashboard items={items} setItems={setItems} onLogout={() => setView("public")} />
+        )}
+      </main>
 
-        .contact-section { background: var(--bg-surface); border-top: 1px solid rgba(212,0,255,0.08); padding: 6rem 2rem; }
-        .contact-flex-container { display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap; max-width: 1100px; margin: 0 auto; }
-        .contact-badge { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.03); padding: 1.5rem 2rem; min-width: 220px; flex: 1; max-width: 260px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
-        .badge-label { color: #4b5568; font-size: 0.7rem; letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 0.6rem; font-weight: 600; }
-        .badge-value { color: var(--text-cyan); font-family: 'Cinzel', serif; font-size: 0.95rem; }
-        .badge-link { color: var(--text-cyan); text-decoration: none; font-family: 'Cinzel', serif; font-size: 0.95rem; transition: color 0.2s; }
-        .badge-link:hover { color: var(--neon-magenta); text-shadow: 0 0 8px rgba(212,0,255,0.4); }
-        .footer-credits { text-align: center; padding: 2rem; color: #3a4050; font-size: 0.8rem; letter-spacing: 0.15em; background: #040407; border-top: 1px solid rgba(0,0,0,0.5); }
-
-        .lightbox-overlay { position: fixed; inset: 0; background: rgba(3,3,5,0.95); backdrop-filter: blur(6px); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 2rem; animation: fadeIn 0.25s ease; }
-        .lightbox-window { max-width: 850px; width: 100%; background: var(--bg-card); border: 1px solid rgba(212,0,255,0.25); box-shadow: 0 20px 50px rgba(0,0,0,0.6); }
-        .lightbox-img { width: 100%; max-height: 65vh; object-fit: contain; display: block; background: #020204; }
-        .lightbox-footer { padding: 1.75rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem; border-top: 1px solid rgba(255,255,255,0.02); }
-        .lightbox-title { font-family: 'Cinzel', serif; color: var(--text-cyan); font-size: 1.3rem; }
-        .lightbox-desc { color: #808b98; margin-top: 0.5rem; font-size: 0.95rem; font-weight: 300; }
-        .btn-close-modal { width: 100%; padding: 1rem; background: #151520; border: none; border-top: 1px solid rgba(255,255,255,0.04); color: #5a6578; cursor: pointer; letter-spacing: 0.2em; font-size: 0.8rem; font-weight: 600; transition: all 0.2s; }
-        .btn-close-modal:hover { background: #1a1a26; color: #fff; }
-
-        .admin-bg { background: var(--bg-darker); min-height: 100vh; font-family: 'Raleway', sans-serif; }
-        .admin-header { background: #0d0d14; border-bottom: 1px solid var(--border-color); padding: 1.5rem 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
-        .admin-title { font-family: 'Black Ops One', cursive; color: var(--text-cyan); font-size: 1.4rem; letter-spacing: 1px; }
-        .admin-subtitle { color: #404b5a; font-size: 0.75rem; letter-spacing: 0.2em; margin-top: 0.25rem; font-weight: 700; }
-        .allocation-counter { color: #5a6578; font-size: 0.8rem; font-weight: 600; background: #07070a; padding: 0.4rem 1rem; border: 1px solid rgba(255,255,255,0.02); }
-        
-        .btn-logout { padding: 0.5rem 1.5rem; background: transparent; border: 1px solid #3a4050; color: #7a8598; cursor: pointer; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.1em; transition: all 0.2s; }
-        .btn-logout:hover { border-color: #ff3344; color: #ff3344; background: rgba(255,50,68,0.05); }
-        
-        .admin-workspace-grid { max-width: 1200px; margin: 0 auto; padding: 3rem 2rem; display: grid; grid-template-columns: 360px 1fr; gap: 3rem; }
-        @media(max-width: 900px) { .admin-workspace-grid { grid-template-columns: 1fr; } }
-        
-        .admin-form-card { background: var(--bg-card); border: 1px solid var(--border-color); padding: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
-        .form-card-title { color: var(--text-cyan); font-family: 'Cinzel', serif; font-size: 1.1rem; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(212,0,255,0.1); padding-bottom: 0.75rem; }
-        
-        .admin-input {
-          width: 100%; padding: 0.85rem 1.2rem; background: #07070a;
-          border: 1px solid rgba(212,0,255,0.15); color: #ddd;
-          font-family: 'Raleway', sans-serif; font-size: 0.95rem; outline: none;
-          margin-bottom: 1rem; box-sizing: border-box; transition: all 0.25s;
-        }
-        .admin-input:focus { border-color: var(--neon-orange); box-shadow: 0 0 10px rgba(255,68,0,0.15); }
-        
-        .uploader-zone { border: 2px dashed rgba(212,0,255,0.2); padding: 2rem; text-align: center; cursor: pointer; margin-bottom: 1rem; background: rgba(212,0,255,0.02); transition: all 0.3s; }
-        .uploader-zone:hover { border-color: var(--neon-magenta); background: rgba(212,0,255,0.05); }
-        .uploader-preview-img { max-width: 100%; max-height: 180px; object-fit: contain; }
-        .uploader-prompt { color: #5a6578; font-size: 0.9rem; line-height: 1.5; }
-        
-        .btn-submit-asset { flex: 1; padding: 0.95rem; background: linear-gradient(135deg, var(--neon-magenta), var(--neon-orange)); border: none; color: #fff; cursor: pointer; font-family: 'Cinzel', serif; letter-spacing: 0.15em; font-size: 0.85rem; font-weight: 700; transition: opacity 0.2s; text-align: center; }
-        .btn-submit-asset:hover { opacity: 0.9; }
-        .btn-submit-asset:disabled { background: #222; color: #555; cursor: not-allowed; }
-        .btn-cancel-edit { padding: 0.95rem 1.2rem; background: transparent; border: 1px solid #3a4050; color: #7a8598; cursor: pointer; font-size: 0.85rem; }
-        
-        .tips-card { margin-top: 1.5rem; background: var(--bg-card); border: 1px solid rgba(255,255,255,0.02); padding: 1.25rem 1.5rem; }
-        .tips-text { color: #5a6578; font-size: 0.8rem; line-height: 1.8; }
-        
-        .admin-empty-state { color: #4a5568; padding: 5rem 2rem; text-align: center; border: 1px dashed rgba(255,255,255,0.03); font-size: 0.95rem; }
-        .admin-mini-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1.5rem; }
-        .admin-mini-card { background: #0d0d14; border: 1px solid rgba(255,255,255,0.03); overflow: hidden; transition: border 0.2s; }
-        .admin-mini-card.active-edit { border-color: var(--neon-magenta); box-shadow: 0 0 15px rgba(212,0,255,0.2); }
-        .mini-card-img-wrap { position: relative; padding-bottom: 75%; background: #050508; }
-        .mini-card-title { color: #a0aec0; font-size: 0.85rem; font-family: 'Cinzel', serif; margin-bottom: 0.2rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .mini-card-price { color: #ff55bb; font-size: 0.8rem; font-weight: 600; }
-        
-        .btn-mini-action { flex: 1; padding: 0.4rem; border: none; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.05em; cursor: pointer; }
-        .btn-mini-action.edit { background: rgba(212,0,255,0.12); color: #ff66dd; border: 1px solid rgba(212,0,255,0.2); }
-        .btn-mini-action.delete { background: rgba(255,68,0,0.08); color: #ff6644; border: 1px solid rgba(255,68,0,0.15); }
-        .btn-mini-action:hover { opacity: 0.85; }
-
-        .login-wrapper { min-height: 100vh; background: var(--bg-darker); display: flex; align-items: center; justify-content: center; padding: 2rem; }
-        .login-card-panel { background: var(--bg-card); border: 1px solid var(--border-color); padding: 3rem 2.5rem; width: 100%; max-width: 380px; text-align: center; box-shadow: 0 15px 40px rgba(0,0,0,0.5); }
-        .login-emblem { font-size: 2.5rem; margin-bottom: 1rem; filter: drop-shadow(0 0 10px var(--neon-magenta)); }
-        .login-heading { font-family: 'Black Ops One', cursive; color: var(--text-cyan); font-size: 1.5rem; letter-spacing: 1px; }
-        .login-subheading { color: #404b5a; font-size: 0.75rem; letter-spacing: 0.25em; margin-bottom: 2rem; font-weight: 700; }
-        .login-error-text { color: #ff4444; font-size: 0.85rem; margin-bottom: 1rem; }
-
-        .status-banner { padding: 0.9rem; text-align: center; font-size: 0.9rem; font-weight: 600; letter-spacing: 0.05em; }
-        .status-banner.success { background: rgba(0,240,140,0.08); border-bottom: 1px solid rgba(0,240,140,0.2); color: #20e090; }
-        .status-banner.error { background: rgba(255,80,0,0.08); border-bottom: 1px solid rgba(255,80,0,0.2); color: #ff6040; }
-        
-        .loading-screen { min-height: 100vh; background: var(--bg-darker); display: flex; align-items: center; justify-content: center; color: var(--text-cyan); font-family: 'Cinzel', serif; letter-spacing: 0.25em; font-size: 0.9rem; }
-
-        @keyframes flicker {
-          0% { filter: drop-shadow(0 0 4px var(--neon-orange)) brightness(0.9); }
-          100% { filter: drop-shadow(0 0 14px #ff8c00) brightness(1.2); }
-        }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-      `}</style>
-
-      {/* Hidden admin trigger bottom right — click 5x fast */}
-      {view === "public" && (
-        <>
-          <Gallery items={items} />
-          <div onClick={handleLogoClick} style={{ position: "fixed", bottom: 0, right: 0, width: 24, height: 24, cursor: "default", zIndex: 9999, opacity: 0 }} />
-        </>
-      )}
-      {view === "login" && <Login onLogin={() => setView("admin")} />}
-      {view === "admin" && (
-        <Admin 
-          items={items} 
-          setItems={updateItemsAndStorage} 
-          onLogout={() => setView("public")} 
-        />
-      )}
-    </>
+      {/* FOOTER STRIP WITH INTEGRATED ACCESS TRIGGER */}
+      <footer className="system-footer" onClick={handleFooterClick} style={{ cursor: "pointer", padding: "2rem 1rem" }}>
+        <p className="footer-copyright">
+          © 2026 Mustang Metal Creations · Southern Oregon
+        </p>
+      </footer>
+    </div>
   );
 }
-
