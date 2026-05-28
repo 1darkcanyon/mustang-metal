@@ -1,0 +1,268 @@
+/* Custom Industrial Fonts & Resets */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Space+Grotesk:wght@400;500;700&display=swap');
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: #0b0c10;
+  color: #c5c6c7;
+  font-family: 'Space Grotesk', sans-serif;
+  overflow-x: hidden;
+}
+
+/* Base Container */
+.app-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header & Brand Identity */
+.brand-header {
+  text-align: center;
+  padding: 3rem 1rem 2rem 1rem;
+}
+
+.logo-area {
+  margin-bottom: 1.5rem;
+}
+
+.flame-effect {
+  font-size: 1.8rem;
+  display: inline-block;
+  animation: flicker 0.5s infinite alternate;
+}
+
+@keyframes flicker {
+  0% { transform: scale(1); filter: drop-shadow(0 0 2px #ff4500); }
+  100% { transform: scale(1.1); filter: drop-shadow(0 0 8px #ff8c00); }
+}
+
+.neon-text-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 2.8rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+  color: #fff;
+  text-shadow: 0 0 5px #fff, 0 0 10px #ff007f, 0 0 20px #ff007f;
+  line-height: 1.1;
+}
+
+.neon-text-title.secondary {
+  text-shadow: 0 0 5px #fff, 0 0 10px #00f0ff, 0 0 20px #00f0ff;
+  margin-bottom: 0.5rem;
+}
+
+.tagline {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.9rem;
+  letter-spacing: 4px;
+  color: #66fcf1;
+  margin-top: 0.5rem;
+}
+
+.accent-bar {
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #ff007f, #00f0ff, transparent);
+  width: 80%;
+  margin: 1.5rem auto;
+}
+
+.intro-paragraph {
+  max-width: 600px;
+  margin: 0 auto;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: #a9b2c3;
+}
+
+/* Sections */
+.gallery-section {
+  padding: 2rem 0;
+  flex: 1;
+}
+
+.section-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.8rem;
+  text-align: center;
+  color: #fff;
+  margin-bottom: 0.2rem;
+}
+
+.section-subtitle {
+  text-align: center;
+  color: #66fcf1;
+  font-size: 0.9rem;
+  margin-bottom: 2rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+/* Empty States & Fallbacks */
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  font-size: 1.1rem;
+  color: #8f94a5;
+}
+
+/* Grid Layout Elements */
+.grid-layout {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.gallery-card {
+  background: #1f2833;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: transform 0.2s, border-color 0.2s;
+}
+
+.gallery-card:active {
+  transform: scale(0.98);
+  border-color: #00f0ff;
+}
+
+.card-image-wrapper {
+  position: relative;
+  width: 100%;
+  padding-top: 75%;
+  background: #0b0c10;
+}
+
+.card-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.card-body {
+  padding: 1.25rem;
+}
+
+.card-heading {
+  color: #fff;
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.card-text {
+  font-size: 0.95rem;
+  color: #a9b2c3;
+  margin-bottom: 1rem;
+  line-height: 1.4;
+}
+
+.card-price-tag {
+  display: inline-block;
+  background: rgba(0, 240, 255, 0.1);
+  border: 1px solid #00f0ff;
+  color: #00f0ff;
+  padding: 0.25rem 0.7rem;
+  border-radius: 4px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.85rem;
+}
+
+/* Admin Dashboard & Login Panel Styling */
+.login-wrapper, .admin-dashboard {
+  max-width: 450px;
+  margin: 4rem auto;
+  background: #151a22;
+  border: 1px solid #ff007f;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 0 15px rgba(255, 0, 127, 0.2);
+}
+
+.admin-dashboard {
+  max-width: 700px;
+  border-color: #00f0ff;
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+}
+
+.login-card-panel {
+  text-align: center;
+}
+
+.login-emblem {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.login-heading {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.5rem;
+  color: #fff;
+}
+
+.login-subheading {
+  font-size: 0.8rem;
+  letter-spacing: 2px;
+  color: #ff007f;
+  margin-bottom: 2rem;
+}
+
+.admin-input, .upload-form input, .upload-form textarea {
+  width: 100%;
+  background: #0b0c10;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.8rem;
+  border-radius: 6px;
+  color: #fff;
+  font-family: inherit;
+  margin-bottom: 1rem;
+}
+
+.admin-input:focus, .upload-form input:focus {
+  outline: none;
+  border-color: #00f0ff;
+}
+
+.action-btn {
+  width: 100%;
+  background: #ff007f;
+  color: #fff;
+  border: none;
+  padding: 0.8rem;
+  border-radius: 6px;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: bold;
+  cursor: pointer;
+  letter-spacing: 1px;
+}
+
+.action-btn:active {
+  background: #d00068;
+}
+
+/* Footer Styling */
+.system-footer {
+  text-align: center;
+  margin-top: auto;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.footer-copyright {
+  font-size: 0.85rem;
+  color: #4f5361;
+  letter-spacing: 1px;
+}
+
